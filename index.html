@@ -3,15 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok-like Video Feed</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Video Player</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-y: hidden;
+        }
+        .video-container {
+            width: 100%;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        video {
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
-    <div class="container" id="videoContainer">
-        <!-- Video items will be inserted here by JavaScript -->
+    <div class="video-container">
+        <video id="videoPlayer" controls>
+            <source src="video1.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
     </div>
 
-    <script src="scripts.js"></script>
+    <script>
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoSources = ['video1.mp4', 'video2.mp4', 'video3.mp4']; // Add your video sources here
+        let currentIndex = 0;
+
+        const playNextVideo = () => {
+            currentIndex = (currentIndex + 1) % videoSources.length;
+            videoPlayer.src = videoSources[currentIndex];
+            videoPlayer.play();
+        };
+
+        const handleScroll = () => {
+            playNextVideo();
+        };
+
+        const handleVideoEnd = () => {
+            if (!isScrolling) {
+                videoPlayer.src = videoSources[currentIndex]; // Loop the same video if not scrolling
+                videoPlayer.play();
+            }
+        };
+
+        let isScrolling = false;
+        let scrollTimeout;
+
+        window.addEventListener('scroll', () => {
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
+
+            isScrolling = true;
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+            }, 100); // Time delay before scroll is considered finished
+        });
+
+        videoPlayer.addEventListener('ended', handleVideoEnd);
+
+        // Initial setup
+        videoPlayer.src = videoSources[currentIndex];
+    </script>
 </body>
 </html>
- 
