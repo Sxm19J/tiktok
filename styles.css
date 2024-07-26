@@ -4,7 +4,6 @@ body, html {
     overflow: hidden; /* Hide the scrollbar */
     height: 100%;
     font-family: Arial, sans-serif;
-    scroll-behavior: smooth;
 }
 
 .container {
