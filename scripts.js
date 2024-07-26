@@ -60,6 +60,34 @@ videos.forEach(video => {
     container.appendChild(videoItem);
 });
 
+let currentIndex = 0; // Start at the first video
+
+function loadVideo(index) {
+    const videoPlayer = document.getElementById('video-player');
+    const videoSource = document.getElementById('video-source');
+
+    if (index >= 0 && index < videos.length) {
+        videoSource.src = videos[index].src;
+        videoPlayer.load();
+        videoPlayer.play();
+        currentIndex = index;
+    }
+}
+
+document.getElementById('prev-button').addEventListener('click', () => {
+    if (currentIndex > 0) {
+        loadVideo(currentIndex - 1);
+    } else {
+    }
+});
+
+document.getElementById('next-button').addEventListener('click', () => {
+    if (currentIndex < videos.length - 1) {
+        loadVideo(currentIndex + 1);
+    } else {
+    }
+});
+
 // Function to handle video play/pause and restart based on visibility
 const handleVisibility = (entries) => {
     entries.forEach(entry => {
