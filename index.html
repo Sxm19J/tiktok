@@ -3,69 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Playlist</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden; /* Hide overflow to prevent scroll bars */
-        }
-        .video-container {
-            width: 100%;
-            max-width: 720px;
-            margin: 0 auto;
-        }
-        video {
-            width: 100%;
-            height: auto;
-        }
-    </style>
+    <title>TikTok-like Video Feed</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="video-container">
-        <video id="videoPlayer" controls>
-            <source src="video1.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+    <div class="container" id="videoContainer">
+        <!-- Video items will be inserted here by JavaScript -->
     </div>
 
-    <script>
-        const videoPlayer = document.getElementById('videoPlayer');
-        const videoSources = ['video1.mp4', 'video2.mp4', 'video3.mp4']; // Replace with your video sources
-        let currentIndex = 0;
-        let scrollTimeout;
-        let isScrolling = false;
-
-        const playNextVideo = () => {
-            currentIndex = (currentIndex + 1) % videoSources.length;
-            videoPlayer.src = videoSources[currentIndex];
-            videoPlayer.play();
-        };
-
-        const handleScroll = () => {
-            if (scrollTimeout) {
-                clearTimeout(scrollTimeout);
-            }
-            playNextVideo();
-            isScrolling = true;
-            scrollTimeout = setTimeout(() => {
-                isScrolling = false;
-            }, 100); // Delay before the scroll is considered finished
-        };
-
-        const handleVideoEnd = () => {
-            if (!isScrolling) {
-                videoPlayer.src = videoSources[currentIndex];
-                videoPlayer.play();
-            }
-        };
-
-        window.addEventListener('scroll', handleScroll);
-
-        videoPlayer.addEventListener('ended', handleVideoEnd);
-
-        // Initial setup
-        videoPlayer.src = videoSources[currentIndex];
-    </script>
+    <script src="scripts.js"></script>
 </body>
 </html>
