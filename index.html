@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Player</title>
+    <title>Video Playlist</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            overflow-y: hidden;
+            overflow: hidden; /* Hide overflow to prevent scroll bars */
         }
         .video-container {
             width: 100%;
@@ -17,6 +17,7 @@
         }
         video {
             width: 100%;
+            height: auto;
         }
     </style>
 </head>
@@ -30,9 +31,10 @@
 
     <script>
         const videoPlayer = document.getElementById('videoPlayer');
-        const videoSources = ['video1.mp4', 'video2.mp4', 'video3.mp4']; // Add your video sources here
+        const videoSources = ['video1.mp4', 'video2.mp4', 'video3.mp4']; // Replace with your video sources
         let currentIndex = 0;
         let scrollTimeout;
+        let isScrolling = false;
 
         const playNextVideo = () => {
             currentIndex = (currentIndex + 1) % videoSources.length;
@@ -45,21 +47,20 @@
                 clearTimeout(scrollTimeout);
             }
             playNextVideo();
+            isScrolling = true;
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+            }, 100); // Delay before the scroll is considered finished
         };
 
         const handleVideoEnd = () => {
-            if (!scrollTimeout) {
+            if (!isScrolling) {
                 videoPlayer.src = videoSources[currentIndex];
                 videoPlayer.play();
             }
         };
 
-        window.addEventListener('scroll', () => {
-            handleScroll();
-            scrollTimeout = setTimeout(() => {
-                scrollTimeout = null;
-            }, 100); // Time delay before scroll is considered finished
-        });
+        window.addEventListener('scroll', handleScroll);
 
         videoPlayer.addEventListener('ended', handleVideoEnd);
 
