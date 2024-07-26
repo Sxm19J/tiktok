@@ -32,6 +32,7 @@
         const videoPlayer = document.getElementById('videoPlayer');
         const videoSources = ['video1.mp4', 'video2.mp4', 'video3.mp4']; // Add your video sources here
         let currentIndex = 0;
+        let scrollTimeout;
 
         const playNextVideo = () => {
             currentIndex = (currentIndex + 1) % videoSources.length;
@@ -40,27 +41,23 @@
         };
 
         const handleScroll = () => {
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
             playNextVideo();
         };
 
         const handleVideoEnd = () => {
-            if (!isScrolling) {
-                videoPlayer.src = videoSources[currentIndex]; // Loop the same video if not scrolling
+            if (!scrollTimeout) {
+                videoPlayer.src = videoSources[currentIndex];
                 videoPlayer.play();
             }
         };
 
-        let isScrolling = false;
-        let scrollTimeout;
-
         window.addEventListener('scroll', () => {
-            if (scrollTimeout) {
-                clearTimeout(scrollTimeout);
-            }
-
-            isScrolling = true;
+            handleScroll();
             scrollTimeout = setTimeout(() => {
-                isScrolling = false;
+                scrollTimeout = null;
             }, 100); // Time delay before scroll is considered finished
         });
 
