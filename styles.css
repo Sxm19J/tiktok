@@ -40,3 +40,7 @@ video {
     border-radius: 5px;
     font-size: 18px;
 }
+
+audio {
+    display: none;
+}
