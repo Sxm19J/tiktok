@@ -83,9 +83,4 @@ const observer = new IntersectionObserver(handleVisibility, {
 // Observe each video item
 document.querySelectorAll('.video-item').forEach(item => {
     observer.observe(item);
-}),
-    {
-    "title": "New Video",
-    "url": "https://example.com/newvideo.mp4"
-}
-];
+});
