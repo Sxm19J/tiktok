@@ -1,3 +1,10 @@
+function shuffleVideos(videos) {
+    for (let i = videos.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [videos[i], videos[j]] = [videos[j], videos[i]];
+    }
+}
+
 const videos = [
     { name: 'cata.leyah', src: 'https://cdn.gilcdn.com/ContentMediaGenericFiles/84b0cb2e86b3054951462f788dc83d90-Full.mp4?w=394&h=720&ia=1&Expires=1722028945&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uZ2lsY2RuLmNvbS8qIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzIyMDI4OTQ1fX19XX0_&Signature=RTTR5aa%7ER%7ENUoqafuVSC65H1On-Ru19zDsNICPsyIL-O3W7DFB8bizyEchwKZ2Eg6NnHqOA9Xvnr8bAIEvra9GnOu4pdF1TQphXvqVSWoF69ZWwMWFbT-1-dibFTZx1puzB5QMTt-qyAQDSgmqhitewldospIrjApXsiPQDtZrYnbfi1V%7EtZ5quPjgI3afcFtCpgTdRLAYj-2B8zC71m%7E7bwEKEH6uQdc1z1xf%7EmoHhSXyEkpYYASDW0zqF7%7EpLaSpJzKNBujFduXX7469Sb-1AfpRZOBkhyuW43uTAcLPSY8gtUobrvod0921jeTfjeF5v345O20hCmpfUfq92trg__&Key-Pair-Id=K1FFKFZRWAZSB' },
     { name: 'Idk', src: 'https://cdn.gilcdn.com/ContentMediaGenericFiles/d8167d8cec2064ec03d49228c7316331-Full.mp4?w=406&h=720&ia=1&Expires=1722028945&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uZ2lsY2RuLmNvbS8qIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzIyMDI4OTQ1fX19XX0_&Signature=RTTR5aa%7ER%7ENUoqafuVSC65H1On-Ru19zDsNICPsyIL-O3W7DFB8bizyEchwKZ2Eg6NnHqOA9Xvnr8bAIEvra9GnOu4pdF1TQphXvqVSWoF69ZWwMWFbT-1-dibFTZx1puzB5QMTt-qyAQDSgmqhitewldospIrjApXsiPQDtZrYnbfi1V%7EtZ5quPjgI3afcFtCpgTdRLAYj-2B8zC71m%7E7bwEKEH6uQdc1z1xf%7EmoHhSXyEkpYYASDW0zqF7%7EpLaSpJzKNBujFduXX7469Sb-1AfpRZOBkhyuW43uTAcLPSY8gtUobrvod0921jeTfjeF5v345O20hCmpfUfq92trg__&Key-Pair-Id=K1FFKFZRWAZSB' },
@@ -28,5 +35,52 @@ const videos = [
     { name: '', src: 'https://cdn.gilcdn.com/ContentMediaGenericFiles/82cf481f5ff055496a34d5a4199504f9-Full.mp4?w=1920&h=1080&ia=1&Expires=1722028945&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uZ2lsY2RuLmNvbS8qIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzIyMDI4OTQ1fX19XX0_&Signature=RTTR5aa%7ER%7ENUoqafuVSC65H1On-Ru19zDsNICPsyIL-O3W7DFB8bizyEchwKZ2Eg6NnHqOA9Xvnr8bAIEvra9GnOu4pdF1TQphXvqVSWoF69ZWwMWFbT-1-dibFTZx1puzB5QMTt-qyAQDSgmqhitewldospIrjApXsiPQDtZrYnbfi1V%7EtZ5quPjgI3afcFtCpgTdRLAYj-2B8zC71m%7E7bwEKEH6uQdc1z1xf%7EmoHhSXyEkpYYASDW0zqF7%7EpLaSpJzKNBujFduXX7469Sb-1AfpRZOBkhyuW43uTAcLPSY8gtUobrvod0921jeTfjeF5v345O20hCmpfUfq92trg__&Key-Pair-Id=K1FFKFZRWAZSB' },
     { name: '', src: 'https://cdn.gilcdn.com/ContentMediaGenericFiles/f8be2fb0ce70165ad8e612141bc7b106-Full.mp4?w=1920&h=1080&ia=1&Expires=1722028945&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uZ2lsY2RuLmNvbS8qIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzIyMDI4OTQ1fX19XX0_&Signature=RTTR5aa%7ER%7ENUoqafuVSC65H1On-Ru19zDsNICPsyIL-O3W7DFB8bizyEchwKZ2Eg6NnHqOA9Xvnr8bAIEvra9GnOu4pdF1TQphXvqVSWoF69ZWwMWFbT-1-dibFTZx1puzB5QMTt-qyAQDSgmqhitewldospIrjApXsiPQDtZrYnbfi1V%7EtZ5quPjgI3afcFtCpgTdRLAYj-2B8zC71m%7E7bwEKEH6uQdc1z1xf%7EmoHhSXyEkpYYASDW0zqF7%7EpLaSpJzKNBujFduXX7469Sb-1AfpRZOBkhyuW43uTAcLPSY8gtUobrvod0921jeTfjeF5v345O20hCmpfUfq92trg__&Key-Pair-Id=K1FFKFZRWAZSB' },
     { name: '', src: 'https://cdn.gilcdn.com/ContentMediaGenericFiles/0d87fd30480abf1f8d0438e2e69af4da-Full.mp4?w=1920&h=1080&ia=1&Expires=1722028945&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uZ2lsY2RuLmNvbS8qIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzIyMDI4OTQ1fX19XX0_&Signature=RTTR5aa%7ER%7ENUoqafuVSC65H1On-Ru19zDsNICPsyIL-O3W7DFB8bizyEchwKZ2Eg6NnHqOA9Xvnr8bAIEvra9GnOu4pdF1TQphXvqVSWoF69ZWwMWFbT-1-dibFTZx1puzB5QMTt-qyAQDSgmqhitewldospIrjApXsiPQDtZrYnbfi1V%7EtZ5quPjgI3afcFtCpgTdRLAYj-2B8zC71m%7E7bwEKEH6uQdc1z1xf%7EmoHhSXyEkpYYASDW0zqF7%7EpLaSpJzKNBujFduXX7469Sb-1AfpRZOBkhyuW43uTAcLPSY8gtUobrvod0921jeTfjeF5v345O20hCmpfUfq92trg__&Key-Pair-Id=K1FFKFZRWAZSB' },
-    { name: '', src: 'https://cdn.gilcdn.com/ContentMediaGenericFiles/ef0360991bd1c305dbd0bfe07b61d432-Full.mp4?w=480&h=854&ia=1&Expires=1722028945&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uZ2lsY2RuLmNvbS8qIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzIyMDI4OTQ1fX19XX0_&Signature=RTTR5aa%7ER%7ENUoqafuVSC65H1On-Ru19zDsNICPsyIL-O3W7DFB8bizyEchwKZ2Eg6NnHqOA9Xvnr8bAIEvra9GnOu4pdF1TQphXvqVSWoF69ZWwMWFbT-1-dibFTZx1puzB5QMTt-qyAQDSgmqhitewldospIrjApXsiPQDtZrYnbfi1V%7EtZ5quPjgI3afcFtCpgTdRLAYj-2B8zC71m%7E7bwEKEH6uQdc1z1xf%7EmoHhSXyEkpYYASDW0zqF7%7EpLaSpJzKNBujFduXX7469Sb-1AfpRZOBkhyuW43uTAcLPSY8gtUobrvod0921jeTfjeF5v345O20hCmpfUfq92trg__&Key-Pair-Id=K1FFKFZRWAZSB' }
+    { name: '', src: 'https://cdn.gilcdn.com/ContentMediaGenericFiles/ef0360991bd1c305dbd0bfe07b61d432-Full.mp4?w=480&h=854&ia=1&Expires=1722028945&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZG4uZ2lsY2RuLmNvbS8qIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzIyMDI4OTQ1fX19XX0_&Signature=RTTR5aa%7ER%7ENUoqafuVSC65H1On-Ru19zDsNICPsyIL-O3W7DFB8bizyEchwKZ2Eg6NnHqOA9Xvnr8bAIEvra9GnOu4pdF1TQphXvqVSWoF69ZWwMWFbT-1-dibFTZx1puzB5QMTt-qyAQDSgmqhitewldospIrjApXsiPQDtZrYnbfi1V%7EtZ5quPjgI3afcFtCpgTdRLAYj-2B8zC71m%7E7bwEKEH6uQdc1z1xf%7EmoHhSXyEkpYYASDW0zqF7%7EpLaSpJzKNBujFduXX7469Sb-1AfpRZOBkhyuW43uTAcLPSY8gtUobrvod0921jeTfjeF5v345O20hCmpfUfq92trg__&Key-Pair-Id=K1FFKFZRWAZSB' },
+    // { name: '', src: '' },
+    // { name: '', src: '' },
 ];
+
+const container = document.getElementById('videoContainer');
+
+shuffleVideos(videos)
+
+// Insert videos into the container
+videos.forEach(video => {
+    const videoItem = document.createElement('div');
+    videoItem.classList.add('video-item');
+    videoItem.innerHTML = 
+        <video controls loop>
+            <source src="${video.src}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="video-info">
+            ${video.name}
+        </div>
+    ;
+    container.appendChild(videoItem);
+});
+
+// Function to handle video play/pause and restart based on visibility
+const handleVisibility = (entries) => {
+    entries.forEach(entry => {
+        const video = entry.target.querySelector('video');
+        if (entry.isIntersecting) {
+            video.currentTime = 0; // Restart video when it comes into view
+            video.play();
+        } else {
+            video.pause();
+        }
+    });
+};
+
+// Create an Intersection Observer
+const observer = new IntersectionObserver(handleVisibility, {
+    root: null, // Use the viewport as the container
+    rootMargin: '0px',
+    threshold: 0.5 // Trigger when 50% of the video is visible
+});
+
+// Observe each video item
+document.querySelectorAll('.video-item').forEach(item => {
+    observer.observe(item);
+});
