@@ -60,7 +60,7 @@ videos.forEach(video => {
     const videoItem = document.createElement('div');
     videoItem.classList.add('video-item');
     videoItem.innerHTML = `
-        <video controls loop preload="auto">
+        <video controls loop>
             <source src="${video.src}" type="video/mp4">
             Your browser does not support the video tag.
         </video>
