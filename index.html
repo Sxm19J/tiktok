@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tiktok</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Downloader</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container" id="videoContainer">
-        <!-- Video items will be inserted here by JavaScript -->
-    </div>
-
-    <script src="scripts.js"></script>
+  <div class="container">
+    <h1>Video Downloader</h1>
+    <form id="downloadForm">
+      <input type="url" id="videoUrl" placeholder="Enter video URL" required>
+      <button type="submit">Download Video</button>
+    </form>
+    <div id="downloadLink"></div>
+  </div>
+  <script src="app.js"></script>
 </body>
 </html>
