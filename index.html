@@ -188,17 +188,21 @@
       display: grid;
       place-items: center;
       background: #0a1329;
+      gap: 0.75rem;
     }
 
     .viewer-body video,
     .viewer-body img,
     .viewer-body iframe {
+      width: 100%;
       max-width: 100%;
       max-height: 78vh;
       border: 0;
       border-radius: 10px;
       background: #050b18;
     }
+
+    .viewer-body iframe { min-height: 70vh; }
 
     .viewer-body a { color: #c2d3ff; }
 
@@ -217,7 +221,7 @@
     <header class="header">
       <div>
         <h1>My Content Library</h1>
-        <p class="subtitle">Loads only from <code>/content/files.json</code> (works with direct file links like Gofile).</p>
+        <p class="subtitle">Loads from <code>/content/files.json</code> and opens links in-page (including Gofile links).</p>
       </div>
       <p class="status" id="status">Loading content…</p>
     </header>
@@ -245,43 +249,56 @@
       return idx >= 0 ? cleanPath.slice(idx + 1).toLowerCase() : "";
     }
 
-    function getType(ext) {
-      if (VIDEO_EXTENSIONS.has(ext)) return "video";
-      if (IMAGE_EXTENSIONS.has(ext)) return "image";
-      return "file";
+    function isKnownEmbedHost(url) {
+      return /(^|\.)gofile\.io$/i.test(new URL(url).hostname);
     }
 
-    function createFileItem(path, url, explicitType) {
-      const ext = getFileExtension(path);
+    function getType(pathOrUrl) {
+      const ext = getFileExtension(pathOrUrl);
+      if (VIDEO_EXTENSIONS.has(ext)) return "video";
+      if (IMAGE_EXTENSIONS.has(ext)) return "image";
+
+      try {
+        if (isKnownEmbedHost(pathOrUrl)) return "embed";
+      } catch (_error) {
+        // Ignore URL parse errors and fallback to generic file.
+      }
+
+      return "embed";
+    }
+
+    function createFileItem(name, url, explicitType) {
       return {
-        path,
-        name: path.split("/").pop(),
-        type: explicitType || getType(ext),
+        path: name,
+        name: name.split("/").pop(),
+        type: explicitType || getType(url),
         url
       };
     }
 
-    function makePreview(path, type) {
+    function makePreview(url, type) {
       if (type === "video") {
         const video = document.createElement("video");
         video.className = "preview";
-        video.src = path;
+        video.src = url;
         video.muted = true;
         video.playsInline = true;
         video.preload = "metadata";
         return video;
       }
+
       if (type === "image") {
         const img = document.createElement("img");
         img.className = "preview";
-        img.src = path;
+        img.src = url;
         img.alt = "Preview";
         img.loading = "lazy";
         return img;
       }
+
       const placeholder = document.createElement("div");
       placeholder.className = "preview placeholder";
-      placeholder.textContent = "Open file";
+      placeholder.textContent = "Embed link";
       return placeholder;
     }
 
@@ -305,9 +322,17 @@
         img.alt = item.name;
         viewerBody.appendChild(img);
       } else {
-        const wrapper = document.createElement("p");
-        wrapper.innerHTML = `Preview is not available for this file type. <a href="${item.url}" target="_blank" rel="noopener noreferrer">Download / open in new tab</a>.`;
-        viewerBody.appendChild(wrapper);
+        const iframe = document.createElement("iframe");
+        iframe.src = item.url;
+        iframe.loading = "eager";
+        iframe.referrerPolicy = "no-referrer";
+        iframe.allow = "fullscreen; autoplay";
+        iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads");
+        viewerBody.appendChild(iframe);
+
+        const link = document.createElement("p");
+        link.innerHTML = `If embed fails, <a href="${item.url}" target="_blank" rel="noopener noreferrer">open in new tab</a>.`;
+        viewerBody.appendChild(link);
       }
 
       viewer.classList.add("open");
@@ -328,7 +353,7 @@
       if (!Array.isArray(fileEntries) || fileEntries.length === 0) {
         const empty = document.createElement("article");
         empty.className = "empty";
-        empty.innerHTML = "No files found in <code>/content</code>. Add files and re-deploy.";
+        empty.innerHTML = "No files found in <code>/content/files.json</code>. Add links and re-deploy.";
         grid.appendChild(empty);
         return;
       }
@@ -376,7 +401,7 @@
 
           const displayName = entry.name || url;
           const normalizedType = typeof entry.type === "string" ? entry.type.toLowerCase() : "";
-          const explicitType = ["video", "image", "file"].includes(normalizedType) ? normalizedType : undefined;
+          const explicitType = ["video", "image", "file", "embed"].includes(normalizedType) ? normalizedType : undefined;
 
           return createFileItem(displayName, url, explicitType);
         })
