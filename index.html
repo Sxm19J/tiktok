@@ -76,9 +76,10 @@
       overflow: hidden;
       background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0)) , var(--card);
       box-shadow: var(--shadow);
-      text-decoration: none;
+      text-align: left;
       color: inherit;
       transition: transform 0.2s ease, border-color 0.2s ease;
+      cursor: pointer;
     }
 
     .card:hover {
@@ -129,6 +130,82 @@
       background: rgba(20, 31, 58, 0.4);
     }
 
+    .viewer {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(4, 8, 19, 0.86);
+      padding: 1rem;
+      z-index: 1000;
+    }
+
+    .viewer.open {
+      display: flex;
+    }
+
+    .viewer-card {
+      width: min(1000px, 100%);
+      max-height: 92vh;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .viewer-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .viewer-title {
+      margin: 0;
+      font-size: 0.95rem;
+      overflow-wrap: anywhere;
+      color: #d7e2ff;
+    }
+
+    .viewer-close {
+      border: 1px solid var(--border);
+      background: #182546;
+      color: #d7e2ff;
+      border-radius: 8px;
+      padding: 0.4rem 0.7rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .viewer-body {
+      padding: 0.75rem;
+      overflow: auto;
+      min-height: 280px;
+      display: grid;
+      place-items: center;
+      background: #0a1329;
+    }
+
+    .viewer-body video,
+    .viewer-body img,
+    .viewer-body iframe {
+      max-width: 100%;
+      max-height: 78vh;
+      border: 0;
+      border-radius: 10px;
+      background: #050b18;
+    }
+
+    .viewer-body a {
+      color: #c2d3ff;
+    }
+
     code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       background: rgba(124, 155, 255, 0.15);
@@ -144,7 +221,7 @@
     <header class="header">
       <div>
         <h1>My Content Library</h1>
-        <p class="subtitle">Files are loaded from <code>/content/files.json</code>.</p>
+        <p class="subtitle">Files are auto-loaded from GitHub <code>/content</code> (fallback: <code>/content/files.json</code>).</p>
       </div>
       <p class="status" id="status">Loading content…</p>
     </header>
@@ -152,7 +229,25 @@
     <section class="grid" id="grid"></section>
   </main>
 
+  <section class="viewer" id="viewer" aria-hidden="true">
+    <article class="viewer-card">
+      <header class="viewer-head">
+        <h2 class="viewer-title" id="viewerTitle"></h2>
+        <button class="viewer-close" id="viewerClose" type="button">Close</button>
+      </header>
+      <div class="viewer-body" id="viewerBody"></div>
+    </article>
+  </section>
+
   <script>
+    // Update these for your repository after you deploy.
+    const REPO_CONFIG = {
+      owner: "YOUR_GITHUB_USERNAME",
+      repo: "YOUR_REPOSITORY_NAME",
+      branch: "main",
+      contentDir: "content"
+    };
+
     const VIDEO_EXTENSIONS = new Set(["mp4", "webm", "mov", "mkv", "m4v", "avi"]);
     const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "gif", "webp", "avif"]);
 
@@ -194,6 +289,43 @@
       return placeholder;
     }
 
+    function openViewer(item) {
+      const viewer = document.getElementById("viewer");
+      const viewerTitle = document.getElementById("viewerTitle");
+      const viewerBody = document.getElementById("viewerBody");
+      viewerTitle.textContent = item.name;
+      viewerBody.innerHTML = "";
+
+      if (item.type === "video") {
+        const video = document.createElement("video");
+        video.src = item.url;
+        video.controls = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        viewerBody.appendChild(video);
+      } else if (item.type === "image") {
+        const img = document.createElement("img");
+        img.src = item.url;
+        img.alt = item.name;
+        viewerBody.appendChild(img);
+      } else {
+        const wrapper = document.createElement("p");
+        wrapper.innerHTML = `Preview is not available for this file type. <a href="${item.url}" target="_blank" rel="noopener noreferrer">Download / open in new tab</a>.`;
+        viewerBody.appendChild(wrapper);
+      }
+
+      viewer.classList.add("open");
+      viewer.setAttribute("aria-hidden", "false");
+    }
+
+    function closeViewer() {
+      const viewer = document.getElementById("viewer");
+      const viewerBody = document.getElementById("viewerBody");
+      viewer.classList.remove("open");
+      viewer.setAttribute("aria-hidden", "true");
+      viewerBody.innerHTML = "";
+    }
+
     function renderFiles(fileEntries) {
       const grid = document.getElementById("grid");
       grid.innerHTML = "";
@@ -201,62 +333,114 @@
       if (!Array.isArray(fileEntries) || fileEntries.length === 0) {
         const empty = document.createElement("article");
         empty.className = "empty";
-        empty.innerHTML = "No files found. Add files in <code>/content</code> and list them in <code>/content/files.json</code>.";
+        empty.innerHTML = "No files found in <code>/content</code>. Add files there and ensure GitHub repo settings are correct.";
         grid.appendChild(empty);
         return;
       }
 
-      fileEntries.forEach((entry) => {
-        const relativePath = typeof entry === "string" ? entry : entry.path;
-        if (!relativePath) return;
-
-        const href = relativePath.startsWith("/") ? relativePath : `/content/${relativePath}`;
-        const name = typeof entry === "string" ? relativePath.split("/").pop() : (entry.name || relativePath.split("/").pop());
-        const ext = getFileExtension(href);
-        const type = getType(ext);
-
-        const card = document.createElement("a");
+      fileEntries.forEach((item) => {
+        const card = document.createElement("button");
         card.className = "card";
-        card.href = href;
-        card.target = "_blank";
-        card.rel = "noopener noreferrer";
+        card.type = "button";
+        card.setAttribute("aria-label", `Open ${item.name}`);
 
-        card.appendChild(makePreview(href, type));
+        card.appendChild(makePreview(item.url, item.type));
 
         const meta = document.createElement("div");
         meta.className = "meta";
 
         const title = document.createElement("h2");
         title.className = "name";
-        title.textContent = name;
+        title.textContent = item.name;
 
         const typeTag = document.createElement("p");
         typeTag.className = "type";
-        typeTag.textContent = type;
+        typeTag.textContent = item.type;
 
         meta.appendChild(title);
         meta.appendChild(typeTag);
         card.appendChild(meta);
+
+        card.addEventListener("click", () => openViewer(item));
         grid.appendChild(card);
+      });
+    }
+
+    async function loadFromGithub() {
+      const { owner, repo, branch, contentDir } = REPO_CONFIG;
+      if (!owner || !repo || owner === "YOUR_GITHUB_USERNAME" || repo === "YOUR_REPOSITORY_NAME") {
+        throw new Error("REPO_CONFIG is not set.");
+      }
+
+      const apiUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`;
+      const response = await fetch(apiUrl, { cache: "no-cache" });
+      if (!response.ok) throw new Error(`GitHub API failed: ${response.status}`);
+
+      const data = await response.json();
+      const prefix = `${contentDir}/`;
+      const files = (data.tree || [])
+        .filter((entry) => entry.type === "blob" && entry.path.startsWith(prefix))
+        .map((entry) => {
+          const ext = getFileExtension(entry.path);
+          return {
+            path: entry.path,
+            name: entry.path.split("/").pop(),
+            type: getType(ext),
+            url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${entry.path}`
+          };
+        });
+
+      return files;
+    }
+
+    async function loadFromManifest() {
+      const response = await fetch("./content/files.json", { cache: "no-cache" });
+      if (!response.ok) throw new Error(`Manifest failed: ${response.status}`);
+
+      const data = await response.json();
+      const fileEntries = data.files || data;
+      return (Array.isArray(fileEntries) ? fileEntries : []).map((entry) => {
+        const relativePath = typeof entry === "string" ? entry : entry.path;
+        const name = typeof entry === "string" ? relativePath.split("/").pop() : (entry.name || relativePath.split("/").pop());
+        const url = relativePath.startsWith("/") ? relativePath : `./content/${relativePath}`;
+        const ext = getFileExtension(url);
+        return {
+          path: relativePath,
+          name,
+          type: getType(ext),
+          url
+        };
       });
     }
 
     async function loadFiles() {
       const status = document.getElementById("status");
-      try {
-        const response = await fetch("./content/files.json", { cache: "no-cache" });
-        if (!response.ok) throw new Error(`Failed with status ${response.status}`);
 
-        const data = await response.json();
-        renderFiles(data.files || data);
-        const count = Array.isArray(data.files || data) ? (data.files || data).length : 0;
-        status.textContent = `${count} file${count === 1 ? "" : "s"} loaded`;
-      } catch (error) {
-        status.textContent = "Could not load files.json";
-        renderFiles([]);
-        console.error(error);
+      try {
+        const files = await loadFromGithub();
+        renderFiles(files);
+        status.textContent = `${files.length} file${files.length === 1 ? "" : "s"} loaded from GitHub`;
+      } catch (githubError) {
+        try {
+          const files = await loadFromManifest();
+          renderFiles(files);
+          status.textContent = `${files.length} file${files.length === 1 ? "" : "s"} loaded from local manifest`;
+        } catch (manifestError) {
+          status.textContent = "Could not load files";
+          renderFiles([]);
+          console.error(githubError);
+          console.error(manifestError);
+        }
       }
     }
+
+    document.getElementById("viewerClose").addEventListener("click", closeViewer);
+    document.getElementById("viewer").addEventListener("click", (event) => {
+      if (event.target.id === "viewer") closeViewer();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeViewer();
+    });
 
     loadFiles();
   </script>
