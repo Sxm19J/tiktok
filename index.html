@@ -253,17 +253,26 @@
       return /(^|\.)gofile\.io$/i.test(new URL(url).hostname);
     }
 
+    function normalizeEmbedUrl(rawUrl) {
+      try {
+        const parsed = new URL(rawUrl);
+        if (!isKnownEmbedHost(rawUrl)) return rawUrl;
+
+        const folderMatch = parsed.pathname.match(/^\/d\/([^/?#]+)/i);
+        if (folderMatch && folderMatch[1]) {
+          return `https://gofile.io/e/${folderMatch[1]}`;
+        }
+      } catch (_error) {
+        return rawUrl;
+      }
+
+      return rawUrl;
+    }
+
     function getType(pathOrUrl) {
       const ext = getFileExtension(pathOrUrl);
       if (VIDEO_EXTENSIONS.has(ext)) return "video";
       if (IMAGE_EXTENSIONS.has(ext)) return "image";
-
-      try {
-        if (isKnownEmbedHost(pathOrUrl)) return "embed";
-      } catch (_error) {
-        // Ignore URL parse errors and fallback to generic file.
-      }
-
       return "embed";
     }
 
@@ -323,16 +332,15 @@
         viewerBody.appendChild(img);
       } else {
         const iframe = document.createElement("iframe");
-        iframe.src = item.url;
+        iframe.src = normalizeEmbedUrl(item.url);
         iframe.loading = "eager";
         iframe.referrerPolicy = "no-referrer";
         iframe.allow = "fullscreen; autoplay";
-        iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads");
         viewerBody.appendChild(iframe);
 
-        const link = document.createElement("p");
-        link.innerHTML = `If embed fails, <a href="${item.url}" target="_blank" rel="noopener noreferrer">open in new tab</a>.`;
-        viewerBody.appendChild(link);
+        const note = document.createElement("p");
+        note.innerHTML = "If your host blocks embedding, use a direct media URL in files.json (like .mp4/.jpg).";
+        viewerBody.appendChild(note);
       }
 
       viewer.classList.add("open");
